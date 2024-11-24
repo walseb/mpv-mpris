@@ -1084,13 +1084,20 @@ int mpv_open_cplugin(mpv_handle *mpv)
     ud.paused = FALSE;
 
     g_main_context_push_thread_default(ctx);
+
+    pid_t pid = getpid();
+    char *name = g_strdup_printf("org.mpris.MediaPlayer2.mpv.instance%d", pid);
+
     ud.bus_id = g_bus_own_name(G_BUS_TYPE_SESSION,
-                               "org.mpris.MediaPlayer2.mpv",
+                               name,
                                G_BUS_NAME_OWNER_FLAGS_DO_NOT_QUEUE,
                                on_bus_acquired,
                                NULL,
                                on_name_lost,
                                &ud, NULL);
+
+    g_free(name);
+
     g_main_context_pop_thread_default(ctx);
 
     // Receive event for property changes
